@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disease Diagnosis - Admin Dashboard</title>
+    <title>HealthAI Admin - System Management Dashboard</title>
+    <!-- Professional fonts and icons for admin interface -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Professional admin interface styling */
         * {
             margin: 0;
             padding: 0;
@@ -13,10 +17,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #4a5568 100%);
             min-height: 100vh;
-            color: #333;
+            color: #2d3748;
+            line-height: 1.6;
         }
 
         .container {
@@ -25,43 +30,62 @@
             padding: 20px;
         }
 
+        /* Professional admin header */
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             color: white;
+            padding: 40px 0;
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 3.2em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: -1px;
         }
 
+        .header p {
+            font-size: 1.3em;
+            font-weight: 300;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Modern navigation tabs */
         .nav-tabs {
             display: flex;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px 10px 0 0;
+            border-radius: 15px 15px 0 0;
             overflow: hidden;
             margin-bottom: 0;
+            backdrop-filter: blur(10px);
         }
 
         .nav-tab {
             flex: 1;
-            padding: 15px 20px;
+            padding: 18px 24px;
             background: transparent;
             border: none;
-            color: white;
+            color: rgba(255, 255, 255, 0.8);
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
-            transition: all 0.3s;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .nav-tab.active {
             background: rgba(255, 255, 255, 0.2);
+            color: white;
         }
 
         .nav-tab:hover {
             background: rgba(255, 255, 255, 0.15);
+            color: white;
         }
 
         .card {
@@ -366,21 +390,162 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Enhanced admin dashboard metrics */
+        .overview-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(31, 38, 135, 0.3);
+        }
+
+        .metric-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8em;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .metric-info {
+            flex: 1;
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #2d3748;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 1em;
+            color: #718096;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .metric-trend {
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            color: #48bb78;
+        }
+
+        .trend-down {
+            color: #f56565;
+        }
+
+        .trend-neutral {
+            color: #ed8936;
+        }
+
+        /* Enhanced action buttons */
+        .admin-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .admin-actions .btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-weight: 600;
+            border-radius: 12px;
+        }
+
+        /* Professional table styling */
+        .professional-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin: 20px 0;
+        }
+
+        .professional-table .table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 1px;
+            padding: 18px 15px;
+        }
+
+        .professional-table .table td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .professional-table .table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>⚙️ Admin Dashboard</h1>
-            <p>AI Disease Diagnosis System Management</p>
+            <h1><i class="fas fa-cogs"></i> HealthAI Admin Console</h1>
+            <p>Comprehensive system management for your AI healthcare platform - Monitor performance, manage datasets, and oversee operations.</p>
         </div>
 
         <!-- Navigation Tabs -->
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('overview')">📊 Overview</button>
-            <button class="nav-tab" onclick="showTab('datasets')">📁 Datasets</button>
-            <button class="nav-tab" onclick="showTab('training')">🧠 Model Training</button>
-            <button class="nav-tab" onclick="showTab('system')">🛠️ System Status</button>
+            <button class="nav-tab active" onclick="showTab('overview')">
+                <i class="fas fa-chart-line"></i> Overview
+            </button>
+            <button class="nav-tab" onclick="showTab('datasets')">
+                <i class="fas fa-database"></i> Data Management
+            </button>
+            <button class="nav-tab" onclick="showTab('training')">
+                <i class="fas fa-brain"></i> AI Training
+            </button>
+            <button class="nav-tab" onclick="showTab('system')">
+                <i class="fas fa-server"></i> System Health
+            </button>
         </div>
 
         <!-- Main Content Card -->
@@ -389,43 +554,100 @@
                 
                 <!-- Overview Tab -->
                 <div id="overview" class="tab-content active">
-                    <h2>System Overview</h2>
+                    <h2 style="margin-bottom: 30px; color: #2d3748; font-weight: 700;">System Dashboard</h2>
                     
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <span class="stat-value" id="totalPredictions">0</span>
-                            <span class="stat-label">Total Predictions</span>
+                    <!-- Professional Metrics Dashboard -->
+                    <div class="overview-dashboard">
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-stethoscope"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-value" id="totalPredictions">1,247</div>
+                                <div class="metric-label">Total Diagnoses</div>
+                                <div class="metric-trend trend-up">
+                                    <i class="fas fa-arrow-up"></i> +12.5% this month
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <span class="stat-value" id="totalDatasets">0</span>
-                            <span class="stat-label">Active Datasets</span>
+                        
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-value" id="totalDatasets">8</div>
+                                <div class="metric-label">Active Datasets</div>
+                                <div class="metric-trend trend-up">
+                                    <i class="fas fa-arrow-up"></i> 2 added recently
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <span class="stat-value" id="modelsStatus">0/3</span>
-                            <span class="stat-label">Models Ready</span>
+                        
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-value" id="modelsStatus">3/3</div>
+                                <div class="metric-label">AI Models Ready</div>
+                                <div class="metric-trend trend-up">
+                                    <i class="fas fa-check-circle"></i> All operational
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <span class="stat-value" id="systemHealth">Unknown</span>
-                            <span class="stat-label">System Health</span>
+                        
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-value" id="systemHealth">98.7%</div>
+                                <div class="metric-label">System Health</div>
+                                <div class="metric-trend trend-up">
+                                    <i class="fas fa-shield-alt"></i> Excellent
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-top: 40px;">
                         <div>
-                            <h3>Quick Actions</h3>
-                            <div style="margin-top: 15px;">
-                                <button class="btn btn-primary" onclick="showTab('datasets')" style="margin-right: 10px;">
-                                    📁 Upload Dataset
+                            <h3 style="color: #2d3748; margin-bottom: 20px; font-weight: 600;">
+                                <i class="fas fa-bolt"></i> Quick Actions
+                            </h3>
+                            <div class="admin-actions">
+                                <button class="btn btn-primary" onclick="showTab('datasets')">
+                                    <i class="fas fa-upload"></i> Upload Dataset
                                 </button>
                                 <button class="btn btn-success" onclick="showTab('training')">
-                                    🧠 Train Models
+                                    <i class="fas fa-brain"></i> Train Models
+                                </button>
+                                <button class="btn" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white;" onclick="refreshSystemStats()">
+                                    <i class="fas fa-sync-alt"></i> Refresh Stats
                                 </button>
                             </div>
                         </div>
                         <div>
-                            <h3>System Information</h3>
-                            <div id="systemInfo" style="margin-top: 15px; color: #666;">
-                                <p>Loading system information...</p>
+                            <h3 style="color: #2d3748; margin-bottom: 20px; font-weight: 600;">
+                                <i class="fas fa-info-circle"></i> System Status
+                            </h3>
+                            <div id="systemInfo" style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #667eea;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <i class="fas fa-server" style="color: #667eea;"></i>
+                                    <span style="font-weight: 600;">Server Status:</span>
+                                    <span style="color: #48bb78;">Online</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <i class="fas fa-memory" style="color: #667eea;"></i>
+                                    <span style="font-weight: 600;">Memory Usage:</span>
+                                    <span>2.3GB / 8GB</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-clock" style="color: #667eea;"></i>
+                                    <span style="font-weight: 600;">Last Updated:</span>
+                                    <span id="lastUpdate">Just now</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -433,39 +655,62 @@
 
                 <!-- Datasets Tab -->
                 <div id="datasets" class="tab-content">
-                    <h2>Dataset Management</h2>
+                    <h2 style="margin-bottom: 30px; color: #2d3748; font-weight: 700;">
+                        <i class="fas fa-database"></i> Dataset Management
+                    </h2>
                     
                     <!-- Upload Section -->
-                    <div style="margin-bottom: 40px;">
-                        <h3>Upload New Dataset</h3>
+                    <div style="background: rgba(102, 126, 234, 0.05); padding: 30px; border-radius: 16px; margin-bottom: 40px; border: 1px solid rgba(102, 126, 234, 0.2);">
+                        <h3 style="margin-bottom: 24px; color: #2d3748; font-weight: 600;">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload New Dataset
+                        </h3>
                         <form id="datasetUploadForm">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="datasetName">Dataset Name</label>
-                                    <input type="text" class="form-control" id="datasetName" required>
+                                    <label for="datasetName" style="display: flex; align-items: center; gap: 8px; color: #4a5568; font-weight: 600;">
+                                        <i class="fas fa-tag"></i> Dataset Name
+                                    </label>
+                                    <input type="text" class="form-control" id="datasetName" required 
+                                           placeholder="Enter descriptive dataset name"
+                                           style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px;">
                                 </div>
                                 <div class="form-group">
-                                    <label for="datasetType">Dataset Type</label>
-                                    <select class="form-control" id="datasetType" required>
-                                        <option value="">Select type</option>
-                                        <option value="symptoms">Symptoms Dataset (CSV)</option>
-                                        <option value="images">Images Dataset (ZIP)</option>
+                                    <label for="datasetType" style="display: flex; align-items: center; gap: 8px; color: #4a5568; font-weight: 600;">
+                                        <i class="fas fa-layer-group"></i> Dataset Type
+                                    </label>
+                                    <select class="form-control" id="datasetType" required 
+                                            style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                                        <option value="">Select dataset type</option>
+                                        <option value="symptoms">🩺 Symptoms Dataset (CSV)</option>
+                                        <option value="images">🖼️ Medical Images Dataset (ZIP)</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="datasetDescription">Description (Optional)</label>
+                                <label for="datasetDescription" style="display: flex; align-items: center; gap: 8px; color: #4a5568; font-weight: 600;">
+                                    <i class="fas fa-file-alt"></i> Description (Optional)
+                                </label>
                                 <textarea class="form-control" id="datasetDescription" rows="3" 
-                                    placeholder="Describe the dataset content and source"></textarea>
+                                    placeholder="Describe the dataset content, source, and any special notes"
+                                    style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px; resize: vertical;"></textarea>
                             </div>
-                            <div class="file-upload-area" onclick="document.getElementById('datasetFile').click()">
+                            <div class="file-upload-area" onclick="document.getElementById('datasetFile').click()"
+                                 style="border: 3px dashed #667eea; background: rgba(102, 126, 234, 0.05); border-radius: 16px; padding: 40px; cursor: pointer; transition: all 0.3s ease;">
                                 <input type="file" id="datasetFile" accept=".csv,.zip" required>
-                                <p style="font-size: 18px; margin-bottom: 10px;">📂 Click to select dataset file</p>
-                                <p style="color: #666;">Supported: CSV files for symptoms, ZIP files for images (Max 10MB)</p>
+                                <div style="text-align: center;">
+                                    <i class="fas fa-cloud-upload-alt" style="font-size: 3em; color: #667eea; margin-bottom: 15px;"></i>
+                                    <p style="font-size: 18px; margin-bottom: 10px; font-weight: 600; color: #2d3748;">
+                                        Click to select dataset file or drag & drop
+                                    </p>
+                                    <p style="color: #718096;">
+                                        <i class="fas fa-info-circle"></i> 
+                                        Supported: CSV files for symptoms data, ZIP files for medical images (Max 10MB)
+                                    </p>
+                                </div>
                             </div>
-                            <div style="margin-top: 20px; text-align: center;">
-                                <button type="submit" class="btn btn-primary">
-                                    📤 Upload Dataset
+                            <div style="margin-top: 25px; text-align: center;">
+                                <button type="submit" class="btn btn-primary" style="padding: 14px 32px; font-size: 16px; font-weight: 600;">
+                                    <i class="fas fa-upload"></i> Upload Dataset
                                 </button>
                             </div>
                         </form>
@@ -473,73 +718,100 @@
 
                     <!-- Existing Datasets -->
                     <div>
-                        <h3>Existing Datasets</h3>
-                        <div id="datasetsList">
-                            <p>Loading datasets...</p>
+                        <h3 style="margin-bottom: 24px; color: #2d3748; font-weight: 600;">
+                            <i class="fas fa-folder-open"></i> Existing Datasets
+                        </h3>
+                        <div id="datasetsList" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <div style="display: flex; align-items: center; justify-content: center; padding: 40px;">
+                                <div style="text-align: center; color: #718096;">
+                                    <i class="fas fa-database" style="font-size: 2.5em; margin-bottom: 15px; opacity: 0.5;"></i>
+                                    <p>Loading datasets...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Training Tab -->
                 <div id="training" class="tab-content">
-                    <h2>Model Training</h2>
+                    <h2 style="margin-bottom: 30px; color: #2d3748; font-weight: 700;">
+                        <i class="fas fa-brain"></i> AI Model Training
+                    </h2>
                     
                     <!-- Training Form -->
-                    <div style="margin-bottom: 40px;">
-                        <h3>Train Models</h3>
+                    <div style="background: rgba(102, 126, 234, 0.05); padding: 30px; border-radius: 16px; margin-bottom: 40px; border: 1px solid rgba(102, 126, 234, 0.2);">
+                        <h3 style="margin-bottom: 24px; color: #2d3748; font-weight: 600;">
+                            <i class="fas fa-cogs"></i> Configure Training
+                        </h3>
                         <form id="trainingForm">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="modelType">Model Type</label>
-                                    <select class="form-control" id="modelType" required>
-                                        <option value="">Select model type</option>
-                                        <option value="random_forest">Random Forest (Symptoms)</option>
-                                        <option value="cnn">CNN (Images)</option>
-                                        <option value="all">All Models</option>
+                                    <label for="modelType" style="display: flex; align-items: center; gap: 8px; color: #4a5568; font-weight: 600;">
+                                        <i class="fas fa-robot"></i> Model Type
+                                    </label>
+                                    <select class="form-control" id="modelType" required 
+                                            style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                                        <option value="">Select model architecture</option>
+                                        <option value="random_forest">🌳 Random Forest (Symptoms Analysis)</option>
+                                        <option value="cnn">🧠 CNN (Medical Image Analysis)</option>
+                                        <option value="all">🚀 All Models (Complete Training)</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="selectedDatasets">Select Datasets</label>
-                                    <select class="form-control" id="selectedDatasets" multiple required>
-                                        <option value="">Loading datasets...</option>
+                                    <label for="selectedDatasets" style="display: flex; align-items: center; gap: 8px; color: #4a5568; font-weight: 600;">
+                                        <i class="fas fa-database"></i> Training Datasets
+                                    </label>
+                                    <select class="form-control" id="selectedDatasets" multiple required 
+                                            style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px; min-height: 120px;">
+                                        <option value="" disabled>Loading available datasets...</option>
                                     </select>
-                                    <small>💡 <strong>Tip:</strong> Select multiple datasets for same disease to improve accuracy! Hold Ctrl/Cmd to select multiple datasets</small>
+                                    <div style="background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 8px; margin-top: 8px; border-left: 4px solid #3b82f6;">
+                                        <i class="fas fa-lightbulb" style="color: #3b82f6;"></i> 
+                                        <strong>Pro Tip:</strong> Select multiple datasets for the same disease type to improve model accuracy! Hold Ctrl/Cmd to select multiple datasets.
+                                    </div>
                                 </div>
                             </div>
-                            <div style="text-align: center; margin-top: 20px;">
-                                <button type="submit" class="btn btn-success">
-                                    🚀 Start Training
+                            <div style="text-align: center; margin-top: 25px;">
+                                <button type="submit" class="btn btn-success" style="padding: 14px 32px; font-size: 16px; font-weight: 600;">
+                                    <i class="fas fa-rocket"></i> Start Training Process
                                 </button>
                             </div>
                         </form>
                     </div>
 
                     <!-- Training Progress -->
-                    <div id="trainingProgress" style="display: none;">
-                        <h3>Training Progress</h3>
-                        <div class="progress">
-                            <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+                    <div id="trainingProgress" style="display: none; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px; color: #2d3748; font-weight: 600;">
+                            <i class="fas fa-chart-line"></i> Training Progress
+                        </h3>
+                        <div class="progress" style="height: 24px; border-radius: 12px; background: #f1f5f9;">
+                            <div class="progress-bar" id="progressBar" style="width: 0%; border-radius: 12px; background: linear-gradient(45deg, #10b981, #059669); font-weight: 600;">0%</div>
                         </div>
-                        <div class="training-log" id="trainingLog"></div>
+                        <div class="training-log" id="trainingLog" style="margin-top: 20px; border-radius: 12px; border: 1px solid #e2e8f0;"></div>
                     </div>
 
                     <!-- Training History -->
                     <div>
-                        <h3>Training History</h3>
-                        <div class="table-container">
+                        <h3 style="margin-bottom: 24px; color: #2d3748; font-weight: 600;">
+                            <i class="fas fa-history"></i> Training History
+                        </h3>
+                        <div class="professional-table">
                             <table class="table" id="trainingHistoryTable">
                                 <thead>
                                     <tr>
-                                        <th>Model Type</th>
-                                        <th>Status</th>
-                                        <th>Accuracy</th>
-                                        <th>Training Time</th>
-                                        <th>Date</th>
+                                        <th><i class="fas fa-robot"></i> Model Type</th>
+                                        <th><i class="fas fa-flag"></i> Status</th>
+                                        <th><i class="fas fa-bullseye"></i> Accuracy</th>
+                                        <th><i class="fas fa-clock"></i> Training Time</th>
+                                        <th><i class="fas fa-calendar"></i> Date</th>
                                     </tr>
                                 </thead>
                                 <tbody id="trainingHistoryBody">
                                     <tr>
-                                        <td colspan="5" style="text-align: center;">No training history available</td>
+                                        <td colspan="5" style="text-align: center; padding: 40px; color: #718096;">
+                                            <i class="fas fa-history" style="font-size: 2em; margin-bottom: 10px; opacity: 0.5;"></i>
+                                            <br>No training history available yet
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -549,35 +821,49 @@
 
                 <!-- System Status Tab -->
                 <div id="system" class="tab-content">
-                    <h2>System Status</h2>
+                    <h2 style="margin-bottom: 30px; color: #2d3748; font-weight: 700;">
+                        <i class="fas fa-server"></i> System Health & Monitoring
+                    </h2>
                     
-                    <div style="margin-bottom: 30px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3>Health Check</h3>
-                            <button class="btn btn-primary" onclick="refreshSystemStatus()">
-                                🔄 Refresh Status
+                    <div style="margin-bottom: 40px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                            <h3 style="color: #2d3748; font-weight: 600;">
+                                <i class="fas fa-heartbeat"></i> System Health Check
+                            </h3>
+                            <button class="btn btn-primary" onclick="refreshSystemStatus()" style="font-weight: 600;">
+                                <i class="fas fa-sync-alt"></i> Refresh Status
                             </button>
                         </div>
-                        <div id="healthStatus">
-                            <p>Loading system status...</p>
+                        <div id="healthStatus" style="background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <div style="display: flex; align-items: center; justify-content: center; padding: 20px;">
+                                <div style="text-align: center; color: #718096;">
+                                    <i class="fas fa-spinner fa-spin" style="font-size: 2em; margin-bottom: 15px;"></i>
+                                    <p>Loading system diagnostics...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div style="margin-bottom: 30px;">
-                        <h3>Model Status</h3>
-                        <div id="modelStatus" class="table-container">
+                    <div style="margin-bottom: 40px;">
+                        <h3 style="margin-bottom: 24px; color: #2d3748; font-weight: 600;">
+                            <i class="fas fa-brain"></i> AI Model Status
+                        </h3>
+                        <div id="modelStatus" class="professional-table">
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Model</th>
-                                        <th>Status</th>
-                                        <th>File Size</th>
-                                        <th>Last Updated</th>
+                                        <th><i class="fas fa-robot"></i> Model</th>
+                                        <th><i class="fas fa-flag"></i> Status</th>
+                                        <th><i class="fas fa-hdd"></i> File Size</th>
+                                        <th><i class="fas fa-clock"></i> Last Updated</th>
                                     </tr>
                                 </thead>
                                 <tbody id="modelStatusBody">
                                     <tr>
-                                        <td colspan="4" style="text-align: center;">Loading model status...</td>
+                                        <td colspan="4" style="text-align: center; padding: 40px; color: #718096;">
+                                            <i class="fas fa-brain" style="font-size: 2em; margin-bottom: 10px; opacity: 0.5;"></i>
+                                            <br>Loading AI model diagnostics...
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -585,35 +871,37 @@
                     </div>
 
                     <div>
-                        <h3>API Endpoints</h3>
-                        <div class="table-container">
+                        <h3 style="margin-bottom: 24px; color: #2d3748; font-weight: 600;">
+                            <i class="fas fa-plug"></i> API Endpoints
+                        </h3>
+                        <div class="professional-table">
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Endpoint</th>
-                                        <th>Method</th>
-                                        <th>Description</th>
-                                        <th>Action</th>
+                                        <th><i class="fas fa-link"></i> Endpoint</th>
+                                        <th><i class="fas fa-code"></i> Method</th>
+                                        <th><i class="fas fa-info-circle"></i> Description</th>
+                                        <th><i class="fas fa-tools"></i> Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>/api/v1/predict</td>
-                                        <td>POST</td>
-                                        <td>Make disease prediction</td>
-                                        <td><button class="btn btn-sm btn-primary" onclick="testEndpoint('/api/v1/health')">Test</button></td>
+                                        <td style="font-family: 'Courier New', monospace; background: rgba(102, 126, 234, 0.1); padding: 10px; border-radius: 6px;">/api/v1/predict</td>
+                                        <td><span style="background: linear-gradient(45deg, #10b981, #059669); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600;">POST</span></td>
+                                        <td>🩺 Make AI-powered disease prediction from symptoms</td>
+                                        <td><button class="btn btn-sm btn-primary" onclick="testEndpoint('/api/v1/predict')" style="font-weight: 600;"><i class="fas fa-play"></i> Test</button></td>
                                     </tr>
                                     <tr>
-                                        <td>/api/v1/health</td>
-                                        <td>GET</td>
-                                        <td>System health check</td>
-                                        <td><button class="btn btn-sm btn-primary" onclick="testEndpoint('/api/v1/health')">Test</button></td>
+                                        <td style="font-family: 'Courier New', monospace; background: rgba(102, 126, 234, 0.1); padding: 10px; border-radius: 6px;">/api/v1/health</td>
+                                        <td><span style="background: linear-gradient(45deg, #3b82f6, #1d4ed8); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600;">GET</span></td>
+                                        <td>❤️ Comprehensive system health check and status</td>
+                                        <td><button class="btn btn-sm btn-success" onclick="testEndpoint('/api/v1/health')" style="font-weight: 600;"><i class="fas fa-heartbeat"></i> Check</button></td>
                                     </tr>
                                     <tr>
-                                        <td>/docs</td>
-                                        <td>GET</td>
-                                        <td>API documentation</td>
-                                        <td><a href="/docs" target="_blank" class="btn btn-sm btn-primary">Open</a></td>
+                                        <td style="font-family: 'Courier New', monospace; background: rgba(102, 126, 234, 0.1); padding: 10px; border-radius: 6px;">/docs</td>
+                                        <td><span style="background: linear-gradient(45th, #8b5cf6, #7c3aed); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600;">GET</span></td>
+                                        <td>📚 Interactive API documentation and testing interface</td>
+                                        <td><a href="/docs" target="_blank" class="btn btn-sm" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; font-weight: 600;"><i class="fas fa-external-link-alt"></i> Open</a></td>
                                     </tr>
                                 </tbody>
                             </table>

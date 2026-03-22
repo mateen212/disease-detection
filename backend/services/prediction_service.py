@@ -16,8 +16,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class PredictionService:
+    """Our friendly medical assistant! This class handles all the smart predictions
+    and helps connect patients with AI-powered diagnoses. Think of it as the
+    bridge between human symptoms and artificial intelligence! 🤖👩‍⚕️"""
     def __init__(self):
-        self.fusion_system = None
+        self.fusion_system = None  # We'll wake up our AI brain when needed!
 
     def _get_fusion(self):
         if not self.fusion_system:
@@ -26,7 +29,7 @@ class PredictionService:
         return self.fusion_system
     
     async def create_user(self, db: Session, user_data: UserCreate) -> User:
-        """Create a new user"""
+        """Welcome a new patient to our system! Like filling out forms at a friendly clinic 📝"""
         try:
             db_user = User(**user_data.dict())
             db.add(db_user)
@@ -35,16 +38,17 @@ class PredictionService:
             return db_user
         except SQLAlchemyError as e:
             db.rollback()
-            logger.error(f"Error creating user: {str(e)}")
+            logger.error(f"Oops! Had trouble creating a new patient profile: {str(e)}")
             raise e
     
     async def get_user(self, db: Session, user_id: int) -> Optional[User]:
-        """Get user by ID"""
+        """Find a patient in our system - like looking up someone's medical record 🔍"""
         return db.query(User).filter(User.id == user_id).first()
     
     async def save_symptoms_input(self, db: Session, user_id: int, 
                                  symptoms_data: Dict[str, Any]) -> SymptomsInput:
-        """Save symptoms input to database"""
+        """Carefully record what the patient is experiencing - like a nurse taking notes
+        about symptoms, lab results, and vital signs 📋🩺"""
         try:
             db_symptoms = SymptomsInput(
                 user_id=user_id,
@@ -60,16 +64,17 @@ class PredictionService:
             return db_symptoms
         except SQLAlchemyError as e:
             db.rollback()
-            logger.error(f"Error saving symptoms: {str(e)}")
+            logger.error(f"Had trouble saving the patient's symptoms: {str(e)}")
             raise e
     
     async def save_prediction(self, db: Session, user_id: int, 
                              symptoms_input_id: Optional[int],
                              prediction_data: Dict[str, Any],
                              image_path: Optional[str] = None) -> Prediction:
-        """Save prediction to database"""
+        """Store our AI's diagnosis in the patient's medical record - like a doctor
+        writing their findings in a chart, complete with confidence levels! 📊👩‍⚕️"""
         try:
-            # Prepare SHAP values for storage
+            # Let's organize the AI's explanation for easy understanding 🧠✨
             shap_values = None
             if 'shap_explanation' in prediction_data:
                 shap_values = prediction_data['shap_explanation'].get('feature_importance', {})
@@ -92,7 +97,7 @@ class PredictionService:
             return db_prediction
         except SQLAlchemyError as e:
             db.rollback()
-            logger.error(f"Error saving prediction: {str(e)}")
+            logger.error(f"Something went wrong while saving the AI's diagnosis: {str(e)}")
             raise e
     
     async def make_prediction(self, db: Session, 

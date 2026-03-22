@@ -10,35 +10,38 @@ from backend.config import Config
 from backend.db.database import create_tables, engine
 from backend.routes import predictions, admin, health
 
-# Create directories if they don't exist
-os.makedirs(Config.UPLOAD_DIR, exist_ok=True)
-os.makedirs(Config.DATASET_DIR, exist_ok=True)
-os.makedirs(Config.MODELS_DIR, exist_ok=True)
+# Let's make sure all our important directories are ready to go! 📂
+# Think of these as organized folders where we keep different types of files
+os.makedirs(Config.UPLOAD_DIR, exist_ok=True)  # Where users upload their files
+os.makedirs(Config.DATASET_DIR, exist_ok=True)  # Where we store medical datasets
+os.makedirs(Config.MODELS_DIR, exist_ok=True)   # Where our trained AI models live
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan events"""
-    # Startup
+    """This handles what happens when our app starts up and shuts down - 
+    think of it as the app's birth and farewell ceremonies! 👋"""
+    # Time to wake up and get everything ready! 🌅
     print("🚀 Starting Disease Diagnosis System...")
     
-    # Create database tables
+    # Let's set up our database - it's like preparing filing cabinets for patient data! 🗄️
     try:
         create_tables()
-        print("✅ Database tables created/verified")
+        print("✅ Database tables created/verified - Our digital filing system is ready!")
     except Exception as e:
-        print(f"❌ Database initialization failed: {e}")
+        print(f"❌ Oops! Something went wrong with our database setup: {e}")
     
-    # Check if models directory exists
+    # Making sure our AI models have a cozy home to live in! 🏠
     if os.path.exists(Config.MODELS_DIR):
-        print("📁 Models directory ready")
+        print("📁 Models directory ready - Our AI brains have a safe place to stay!")
     
-    print("🏥 Disease Diagnosis System is ready!")
+    print("🏥 Disease Diagnosis System is ready to help patients!")
     yield
     
-    # Shutdown
-    print("👋 Shutting down Disease Diagnosis System...")
+    # Time to say goodbye and clean up - thanks for using our system! ✨
+    print("👋 Shutting down Disease Diagnosis System - See you next time!")
 
-# Create FastAPI application
+# Here's where we create the heart of our application! ❤️
+# FastAPI is like the receptionist that handles all incoming requests
 app = FastAPI(
     title="AI-Powered Disease Diagnosis System",
     description="""
@@ -80,28 +83,30 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Add CORS middleware
+# Let's set up CORS - it's like telling browsers "Hey, it's okay to talk to us!" 🌍
+# This makes our API accessible from web browsers safely
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify allowed origins
+    allow_origins=["*"],  # In real world, we'd be more picky about who can visit! 🚪
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # All HTTP methods welcome!
+    allow_headers=["*"],  # All headers are friends here!
 )
 
-# Include routers
-app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])
-app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
-app.include_router(health.router, prefix="/api/v1", tags=["Health"])
+# Time to connect our different parts! It's like introducing departments in a hospital 🏥
+app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])  # The diagnosis department
+app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])        # The management office
+app.include_router(health.router, prefix="/api/v1", tags=["Health"])          # The system checkup area
 
-# Serve static files for frontend
+# Let's serve our beautiful web pages! 🎨
+# This is like having a receptionist show visitors to the right waiting rooms
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 if os.path.exists(frontend_dir):
     app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    """Serve the main page"""
+    """Our warm welcome page - like a friendly hospital lobby that greets everyone! 👋"""
     return """
     <!DOCTYPE html>
     <html>
@@ -178,7 +183,7 @@ async def root():
 
 @app.get("/api/v1/info")
 async def get_system_info():
-    """Get system information"""
+    """Share some friendly details about our system - like a digital business card! 💼"""
     return {
         "name": "AI-Powered Disease Diagnosis System",
         "version": "1.0.0",
@@ -206,16 +211,19 @@ async def get_system_info():
     }
 
 if __name__ == "__main__":
-    print("🏥 Starting Disease Diagnosis System...")
-    print(f"📊 Server will run on http://{Config.HOST}:{Config.PORT}")
-    print("📘 API Documentation: http://localhost:8000/docs")
-    print("👤 User Dashboard: http://localhost:8000/static/user/index.html")
-    print("⚙️ Admin Dashboard: http://localhost:8000/static/admin/index.html")
+    # Time to launch our medical AI assistant! 🚀
+    # These lovely messages help everyone know what's happening
+    print("🏥 Starting Disease Diagnosis System - Your AI Health Assistant is waking up...")
+    print(f"📊 Server will be ready to help at http://{Config.HOST}:{Config.PORT}")
+    print("📘 Want to explore our API? Visit: http://localhost:8000/docs")
+    print("👤 Patients can access their dashboard at: http://localhost:8000/static/user/index.html")
+    print("⚙️ Administrators can manage the system at: http://localhost:8000/static/admin/index.html")
     
+    # Let's get this party started! 🎉
     uvicorn.run(
-        "main:app",
-        host=Config.HOST,
-        port=Config.PORT,
-        reload=True,
-        log_level="info"
+        "main:app",          # Our beautiful application
+        host=Config.HOST,    # Where to listen for visitors
+        port=Config.PORT,    # Which door to answer
+        reload=True,         # Automatically restart when we make changes (like a helpful assistant!)
+        log_level="info"     # Keep us informed about what's happening
     )

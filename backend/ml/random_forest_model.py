@@ -14,49 +14,68 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class RandomForestModel:
+    """Our smart Random Forest doctor! 🌳👩‍⚕️
+    
+    This AI model is like having thousands of virtual doctors each giving their opinion,
+    then taking the majority vote to make a diagnosis. It's particularly great at
+    understanding patterns in symptoms and lab values to predict diseases.
+    
+    Think of it as a wise medical committee that never gets tired! 🧝‍♂️✨
+    """
     def __init__(self):
-        self.model = None
-        self.scaler = StandardScaler()
-        self.label_encoder = LabelEncoder()
-        self.feature_names = []
-        self.is_trained = False
+        self.model = None                    # Our AI brain (starts empty, learns from data!)
+        self.scaler = StandardScaler()       # Helps normalize numbers so they play nice together
+        self.label_encoder = LabelEncoder()  # Converts disease names to numbers the AI understands
+        self.feature_names = []              # Keeps track of what symptoms/values we're looking at
+        self.is_trained = False              # Whether our AI has graduated medical school yet! 🎓
         
     def prepare_features(self, data: Dict[str, Any]) -> np.ndarray:
-        """Prepare features from input data"""
+        """Transform human symptoms and lab values into numbers our AI can understand!
+        
+        It's like translating from 'human language' to 'computer language' - 
+        converting things like 'I have a fever' into mathematical patterns
+        that our AI doctor can analyze. 🌡️➡️🔢
+        """
         features = []
         
-        # Symptoms (one-hot encoded)
+        # Let's check each possible symptom - like going through a medical checklist! 📋✅
         symptoms = data.get('symptoms', [])
         for symptom in Config.COMMON_SYMPTOMS:
-            features.append(1 if symptom in symptoms else 0)
+            features.append(1 if symptom in symptoms else 0)  # 1 = "yes I have this", 0 = "nope!"
         
-        # Lab values
-        features.append(data.get('platelets', 150000) / 1000)  # Normalize platelets
-        features.append(data.get('oxygen', 98))                # Oxygen saturation
-        features.append(data.get('wbc', 7000) / 1000)          # Normalize WBC
-        features.append(data.get('temperature', 98.6))         # Temperature
-        features.append(data.get('age', 30))                   # Age
-        features.append(1 if data.get('gender', '').lower() == 'male' else 0)  # Gender
+        # Now for the lab values - these are like vital signs that tell us a lot! 🩺
+        features.append(data.get('platelets', 150000) / 1000)  # Blood clotting helpers (normalized)
+        features.append(data.get('oxygen', 98))                # How well you're breathing (percentage)
+        features.append(data.get('wbc', 7000) / 1000)          # Infection-fighting cells (normalized)
+        features.append(data.get('temperature', 98.6))         # Body heat level
+        features.append(data.get('age', 30))                   # How many birthdays you've celebrated! 🎂
+        features.append(1 if data.get('gender', '').lower() == 'male' else 0)  # Biological factor
         
         return np.array(features).reshape(1, -1)
     
     def create_sample_data(self) -> pd.DataFrame:
-        """Create sample training data for demonstration"""
-        np.random.seed(42)
-        n_samples = 1000
+        """Create some practice patients for our AI to learn from! 📚
+        
+        Since we need training data, this creates fictional (but realistic) patient cases.
+        It's like having our AI study from a medical textbook full of example cases
+        before it starts seeing real patients. Each 'patient' has symptoms, lab values,
+        and a known diagnosis for the AI to learn patterns from! 👩‍💻📊
+        """
+        np.random.seed(42)  # Makes our 'random' patients predictable for testing!
+        n_samples = 1000    # Let's create 1000 practice cases
         
         data = []
         diseases = Config.SYMPTOM_DISEASES
         
         for _ in range(n_samples):
-            # Generate random patient data
-            age = np.random.randint(18, 80)
+            # Create a fictional patient with random characteristics 👤
+            age = np.random.randint(18, 80)  # Adults from 18 to 80 years old
             gender = np.random.choice(['male', 'female'])
             
-            # Randomly select a disease
+            # Pick a disease for this practice case 🎲
             disease = np.random.choice(diseases)
             
-            # Generate symptoms based on disease patterns
+            # Now let's give them realistic symptoms for their condition 🩺
             symptoms = []
             if disease == "Dengue":
                 if np.random.random() > 0.2: symptoms.append("fever")
