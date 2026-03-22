@@ -1,0 +1,4 @@
+# This directory stores uploaded medical datasets
+# CSV files for symptom data, ZIP files for image datasets
+# Files are ignored by git due to size and privacy concerns
+# Use the admin dashboard to upload datasets

@@ -1,0 +1,7 @@
+# This file ensures the saved_models directory exists in git
+# Trained ML models will be stored here but not committed to git due to their size
+# The system will generate models like:
+# - random_forest_model.pkl
+# - cnn_model.h5  
+# - scaler.pkl
+# - label_encoder.pkl
