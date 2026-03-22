@@ -10,6 +10,7 @@ class User(Base):
     name = Column(String(100), nullable=False)
     age = Column(Integer, nullable=False)
     gender = Column(String(10), nullable=False)
+    hashed_password = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships

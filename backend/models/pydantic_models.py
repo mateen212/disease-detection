@@ -6,7 +6,7 @@ from datetime import datetime
 class UserCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     age: int = Field(..., ge=0, le=120)
-    gender: str = Field(..., regex="^(Male|Female|male|female)$")
+    gender: str = Field(..., pattern="^(Male|Female|male|female)$")
 
 class UserResponse(BaseModel):
     id: int
@@ -52,7 +52,7 @@ class MultiplePredictionResponse(BaseModel):
 class DatasetUpload(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = None
-    dataset_type: str = Field(..., regex="^(symptoms|images)$")
+    dataset_type: str = Field(..., pattern="^(symptoms|images)$")
 
 class DatasetResponse(BaseModel):
     id: int
@@ -71,7 +71,7 @@ class DatasetResponse(BaseModel):
 # Training models
 class TrainingRequest(BaseModel):
     dataset_ids: List[int]
-    model_type: str = Field(..., regex="^(random_forest|cnn|all)$")
+    model_type: str = Field(..., pattern="^(random_forest|cnn|all)$")
     parameters: Optional[Dict[str, Any]] = None
 
 class TrainingResponse(BaseModel):

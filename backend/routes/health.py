@@ -4,8 +4,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import os
 
-from db.database import get_db
-from models.pydantic_models import HealthResponse
+from backend.db.database import get_db
+from backend.models.pydantic_models import HealthResponse
 from backend.config import Config
 import logging
 

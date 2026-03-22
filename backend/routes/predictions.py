@@ -7,12 +7,12 @@ from datetime import datetime
 import os
 import shutil
 
-from db.database import get_db
-from models.pydantic_models import (
+from backend.db.database import get_db
+from backend.models.pydantic_models import (
     PredictionRequest, PredictionResponse, MultiplePredictionResponse,
     UserCreate, UserResponse, ErrorResponse
 )
-from services.prediction_service import PredictionService
+from backend.services.prediction_service import PredictionService
 from backend.config import Config
 import logging
 

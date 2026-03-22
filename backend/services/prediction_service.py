@@ -6,10 +6,9 @@ import pandas as pd
 from datetime import datetime
 import shutil
 
-from models.database_models import User, SymptomsInput, Prediction, Dataset
-from models.pydantic_models import UserCreate, DatasetUpload
-from db.database import get_db
-from ml.neuro_symbolic_fusion import NeuroSymbolicFusion
+from backend.models.database_models import User, SymptomsInput, Prediction, Dataset
+from backend.models.pydantic_models import UserCreate, DatasetUpload
+from backend.db.database import get_db
 from backend.config import Config
 import logging
 
@@ -18,7 +17,13 @@ logger = logging.getLogger(__name__)
 
 class PredictionService:
     def __init__(self):
-        self.fusion_system = NeuroSymbolicFusion()
+        self.fusion_system = None
+
+    def _get_fusion(self):
+        if not self.fusion_system:
+            from backend.ml.neuro_symbolic_fusion import NeuroSymbolicFusion
+            self.fusion_system = NeuroSymbolicFusion()
+        return self.fusion_system
     
     async def create_user(self, db: Session, user_data: UserCreate) -> User:
         """Create a new user"""
@@ -137,17 +142,15 @@ class PredictionService:
                 with open(image_path, "wb") as buffer:
                     shutil.copyfileobj(image_file.file, buffer)
             
-            # Make prediction
+            # Make prediction (lazy-load fusion system to avoid heavy imports at startup)
+            fusion = self._get_fusion()
             if image_path and not any([input_data['symptoms'], input_data['platelets'], 
                                      input_data['oxygen'], input_data['wbc']]):
-                # Only image provided - use CNN only
-                prediction_result = self.fusion_system.predict_image(image_path, input_data)
+                prediction_result = fusion.predict_image(image_path, input_data)
             elif image_path:
-                # Both symptoms and image - use combined prediction
-                prediction_result = self.fusion_system.predict_combined(input_data, image_path)
+                prediction_result = fusion.predict_combined(input_data, image_path)
             else:
-                # Only symptoms - use symptom-based models
-                prediction_result = self.fusion_system.predict_symptoms(input_data)
+                prediction_result = fusion.predict_symptoms(input_data)
             
             if 'error' in prediction_result:
                 raise Exception(prediction_result['error'])
@@ -237,7 +240,13 @@ class DatasetService:
 
 class TrainingService:
     def __init__(self):
-        self.fusion_system = NeuroSymbolicFusion()
+        self.fusion_system = None
+
+    def _get_fusion(self):
+        if not self.fusion_system:
+            from backend.ml.neuro_symbolic_fusion import NeuroSymbolicFusion
+            self.fusion_system = NeuroSymbolicFusion()
+        return self.fusion_system
     
     async def train_models(self, db: Session, dataset_ids: List[int], 
                           model_type: str) -> Dict[str, Any]:

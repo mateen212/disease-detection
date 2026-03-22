@@ -6,9 +6,9 @@ import os
 import shutil
 from datetime import datetime
 
-from db.database import get_db
-from models.pydantic_models import DatasetResponse, TrainingRequest, TrainingResponse
-from services.prediction_service import DatasetService, TrainingService
+from backend.db.database import get_db
+from backend.models.pydantic_models import DatasetResponse, TrainingRequest, TrainingResponse
+from backend.services.prediction_service import DatasetService, TrainingService
 from backend.config import Config
 import logging
 
@@ -69,7 +69,7 @@ async def upload_dataset(
             shutil.copyfileobj(file.file, buffer)
         
         # Create dataset record
-        from models.pydantic_models import DatasetUpload
+        from backend.models.pydantic_models import DatasetUpload
         dataset_info = DatasetUpload(
             name=name,
             description=description,

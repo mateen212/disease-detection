@@ -12,6 +12,7 @@ from backend.db.database import create_tables, engine, SessionLocal
 from backend.models.database_models import Base, Admin
 from sqlalchemy import text
 from passlib.hash import bcrypt
+from sqlalchemy import inspect
 import os
 import logging
 
@@ -41,6 +42,15 @@ def init_database():
         admin_username = os.getenv("ADMIN_USERNAME", "admin")
         admin_password = os.getenv("ADMIN_PASSWORD", "adminpass")
 
+        # Ensure `hashed_password` column exists on `users` table, then seed initial admin and a sample user
+        inspector = inspect(engine)
+        users_columns = [c['name'] for c in inspector.get_columns('users')] if 'users' in inspector.get_table_names() else []
+        if 'hashed_password' not in users_columns:
+            logger.info("➕ Adding 'hashed_password' column to 'users' table...")
+            with engine.connect() as conn:
+                conn.execute(text("ALTER TABLE users ADD COLUMN hashed_password VARCHAR(255) NULL"))
+            logger.info("✅ 'hashed_password' column added to 'users'")
+
         logger.info("🔐 Ensuring admin user exists...")
         db = SessionLocal()
         try:
@@ -53,6 +63,28 @@ def init_database():
                 db.add(admin)
                 db.commit()
                 logger.info(f"✅ Admin user '{admin_username}' created")
+            
+            # Seed a sample normal user if not exists
+            user_username = os.getenv("USER_USERNAME", "user")
+            user_password = os.getenv("USER_PASSWORD", "userpass")
+            # import here to avoid circular imports at module import time
+            from backend.models.database_models import User
+            existing_user = db.query(User).filter(User.name == user_username).first()
+            if existing_user:
+                # ensure hashed_password present
+                if not existing_user.hashed_password:
+                    existing_user.hashed_password = bcrypt.hash(user_password)
+                    db.add(existing_user)
+                    db.commit()
+                    logger.info(f"✅ Updated password for existing user '{user_username}'")
+                else:
+                    logger.info(f"ℹ️ User '{user_username}' already exists (id={existing_user.id})")
+            else:
+                hashed_user_pw = bcrypt.hash(user_password)
+                new_user = User(name=user_username, age=30, gender='other', hashed_password=hashed_user_pw)
+                db.add(new_user)
+                db.commit()
+                logger.info(f"✅ Sample user '{user_username}' created (id={new_user.id})")
         finally:
             db.close()
 

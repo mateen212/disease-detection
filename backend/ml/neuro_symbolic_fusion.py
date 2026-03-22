@@ -1,9 +1,9 @@
 from typing import Dict, List, Any, Optional
 import numpy as np
-from ml.random_forest_model import RandomForestModel
-from ml.cnn_model import CNNModel
-from ml.rule_based_system import RuleBasedSystem
-from ml.shap_explainer import SHAPExplainer
+from backend.ml.random_forest_model import RandomForestModel
+from backend.ml.cnn_model import CNNModel
+from backend.ml.rule_based_system import RuleBasedSystem
+from backend.ml.shap_explainer import SHAPExplainer
 from backend.config import Config
 import logging
 

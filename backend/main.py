@@ -7,8 +7,8 @@ import uvicorn
 from contextlib import asynccontextmanager
 
 from backend.config import Config
-from db.database import create_tables, engine
-from routes import predictions, admin, health
+from backend.db.database import create_tables, engine
+from backend.routes import predictions, admin, health
 
 # Create directories if they don't exist
 os.makedirs(Config.UPLOAD_DIR, exist_ok=True)
