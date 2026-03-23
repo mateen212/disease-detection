@@ -12,10 +12,16 @@ class User(Base):
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)     # Unique patient ID number
-    name = Column(String(100), nullable=False)             # What to call our patient 😊
+    email = Column(String(100), unique=True, nullable=False, index=True)  # Login email address 📧
+    first_name = Column(String(50), nullable=False)        # Patient's first name 
+    last_name = Column(String(50), nullable=False)         # Patient's last name
+    name = Column(String(100), nullable=False)             # Full name (computed from first + last)
     age = Column(Integer, nullable=False)                  # How many candles on their birthday cake 🎂
     gender = Column(String(10), nullable=False)            # Biological information for medical context
-    hashed_password = Column(String(255), nullable=True)   # Secure login protection (scrambled!)
+    phone = Column(String(20), nullable=True)              # Contact number 📞
+    hashed_password = Column(String(255), nullable=False)   # Secure login protection (scrambled!)
+    is_active = Column(Integer, default=1)                 # Account status (0 or 1)
+    role = Column(String(20), default="user")              # User role (user/admin)
     created_at = Column(DateTime, default=datetime.utcnow) # When they joined our digital clinic
     
     # These connect to other parts of the patient's digital file 🔗

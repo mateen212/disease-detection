@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from backend.db.database import create_tables, engine, SessionLocal
 from backend.models.database_models import Base, Admin
 from sqlalchemy import text
-from passlib.hash import bcrypt
+from passlib.hash import argon2
 from sqlalchemy import inspect
 import os
 import logging
@@ -58,7 +58,7 @@ def init_database():
             if existing:
                 logger.info(f"ℹ️ Admin user '{admin_username}' already exists (id={existing.id})")
             else:
-                hashed = bcrypt.hash(admin_password)
+                hashed = argon2.hash(admin_password)
                 admin = Admin(username=admin_username, hashed_password=hashed, is_active=1)
                 db.add(admin)
                 db.commit()
@@ -73,14 +73,14 @@ def init_database():
             if existing_user:
                 # ensure hashed_password present
                 if not existing_user.hashed_password:
-                    existing_user.hashed_password = bcrypt.hash(user_password)
+                    existing_user.hashed_password = argon2.hash(user_password)
                     db.add(existing_user)
                     db.commit()
                     logger.info(f"✅ Updated password for existing user '{user_username}'")
                 else:
                     logger.info(f"ℹ️ User '{user_username}' already exists (id={existing_user.id})")
             else:
-                hashed_user_pw = bcrypt.hash(user_password)
+                hashed_user_pw = argon2.hash(user_password)
                 new_user = User(name=user_username, age=30, gender='other', hashed_password=hashed_user_pw)
                 db.add(new_user)
                 db.commit()

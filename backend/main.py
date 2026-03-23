@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 
 from backend.config import Config
 from backend.db.database import create_tables, engine
-from backend.routes import predictions, admin, health
+from backend.routes import predictions, admin, health, auth
 
 # Let's make sure all our important directories are ready to go! 📂
 # Think of these as organized folders where we keep different types of files
@@ -97,6 +97,7 @@ app.add_middleware(
 app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])  # The diagnosis department
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])        # The management office
 app.include_router(health.router, prefix="/api/v1", tags=["Health"])          # The system checkup area
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])  # User login/register system
 
 # Let's serve our beautiful web pages! 🎨
 # This is like having a receptionist show visitors to the right waiting rooms
@@ -674,28 +675,77 @@ async def login_page():
             function handleLogin(event) {
                 event.preventDefault();
                 
-                const email = document.getElementById('email').value;
+                const email = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value;
                 
-                // Simple demo authentication
-                if (email && password) {
-                    // Store user info in localStorage for demo purposes
-                    localStorage.setItem('user', JSON.stringify({
-                        email: email,
-                        role: selectedRole,
-                        name: email.split('@')[0],
-                        loggedIn: true
-                    }));
-                    
-                    // Redirect based on role
-                    if (selectedRole === 'admin') {
-                        window.location.href = '/static/admin/index.html';
-                    } else {
-                        window.location.href = '/static/user/index.html';
-                    }
-                } else {
+                // Validate input
+                if (!email || !password) {
                     alert('Please fill in all fields');
+                    return;
                 }
+                
+                if (!selectedRole) {
+                    alert('Please select your role (Patient or Medical Staff)');
+                    return;
+                }
+                
+                // Show loading
+                const submitButton = event.target.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+                submitButton.disabled = true;
+                
+                // Make API call to backend
+                fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        role: selectedRole
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Store user info in localStorage
+                        const userData = {
+                            ...data.user,
+                            role: data.role,
+                            loggedIn: true
+                        };
+                        localStorage.setItem('user', JSON.stringify(userData));
+                        
+                        // Show success message
+                        alert(data.message);
+                        
+                        // Redirect based on role
+                        if (data.role === 'admin') {
+                            window.location.href = '/static/admin/index.html';
+                        } else {
+                            window.location.href = '/static/user/index.html';
+                        }
+                    } else {
+                        alert(data.message || 'Login failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    if (error.message.includes('401')) {
+                        alert('Invalid credentials. Please check your email and password.');
+                    } else if (error.message.includes('400')) {
+                        alert('Please enter a valid email address.');
+                    } else {
+                        alert('Login failed. Please check your connection and try again.');
+                    }
+                })
+                .finally(() => {
+                    // Reset button
+                    submitButton.innerHTML = originalText;
+                    submitButton.disabled = false;
+                });
             }
         </script>
     </body>
@@ -711,7 +761,7 @@ async def register_page():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Create Account - HealthAI</title>
+        <title>Patient Registration - HealthAI</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <style>
@@ -900,6 +950,25 @@ async def register_page():
                 border-color: #667eea;
             }
             
+            .info-notice {
+                background: linear-gradient(135deg, #e8f4fd 0%, #d6eafc 100%);
+                border: 1px solid #3498db;
+                border-radius: 10px;
+                padding: 15px;
+                margin-bottom: 25px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #2c5282;
+                font-size: 14px;
+                font-weight: 500;
+            }
+            
+            .info-notice i {
+                color: #3498db;
+                font-size: 16px;
+            }
+            
             @media (max-width: 768px) {
                 .form-row {
                     grid-template-columns: 1fr;
@@ -919,21 +988,14 @@ async def register_page():
                     <i class="fas fa-heartbeat"></i>
                     HealthAI
                 </a>
-                <h1 class="register-title">Create Account</h1>
-                <p class="register-subtitle">Join our professional medical AI platform</p>
+                <h1 class="register-title">Patient Registration</h1>
+                <p class="register-subtitle">Create your account to access AI-powered health diagnostics</p>
             </div>
             
             <form id="registerForm" onsubmit="handleRegister(event)">
-                <div class="form-group">
-                    <label class="form-label">I am a...</label>
-                    <div class="role-selector">
-                        <div class="role-option active" onclick="selectRole('user', this)">
-                            <i class="fas fa-user"></i> Patient
-                        </div>
-                        <div class="role-option" onclick="selectRole('admin', this)">
-                            <i class="fas fa-user-md"></i> Medical Professional
-                        </div>
-                    </div>
+                <div class="info-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Patient Registration - Medical staff please use existing admin credentials to login</span>
                 </div>
                 
                 <div class="form-row">
@@ -955,18 +1017,25 @@ async def register_page():
                     </div>
                 </div>
                 
+                <div class="form-group">
+                    <label for="phone" class="form-label">Phone Number (Optional)</label>
+                    <div class="form-input-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="phone" class="form-input" placeholder="+1 (555) 123-4567">
+                    </div>
+                </div>
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label for="age" class="form-label">Age</label>
-                        <input type="number" id="age" class="form-input" placeholder="30" min="1" max="120" required>
+                        <input type="number" id="age" class="form-input" placeholder="30" min="13" max="120" required>
                     </div>
                     <div class="form-group">
                         <label for="gender" class="form-label">Gender</label>
                         <select id="gender" class="form-select" required>
                             <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
                         </select>
                     </div>
                 </div>
@@ -990,50 +1059,96 @@ async def register_page():
         </div>
         
         <script>
-            let selectedRole = 'user'; // Default role
-            
-            function selectRole(role, element) {
-                selectedRole = role;
-                document.querySelectorAll('.role-option').forEach(el => el.classList.remove('active'));
-                element.classList.add('active');
-            }
+            // Registration is only for users/patients
+            // Admin accounts are pre-created and login via the login page
             
             function handleRegister(event) {
                 event.preventDefault();
                 
-                const firstName = document.getElementById('firstName').value;
-                const lastName = document.getElementById('lastName').value;
-                const email = document.getElementById('email').value;
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const email = document.getElementById('email').value.trim();
                 const age = document.getElementById('age').value;
                 const gender = document.getElementById('gender').value;
                 const password = document.getElementById('password').value;
+                const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
                 
-                // Simple validation
+                // Validate input
                 if (!firstName || !lastName || !email || !age || !gender || !password) {
-                    alert('Please fill in all fields');
+                    alert('Please fill in all required fields');
                     return;
                 }
                 
-                // Store user info in localStorage for demo purposes
-                const userData = {
-                    firstName: firstName,
-                    lastName: lastName,
-                    name: `${firstName} ${lastName}`,
-                    email: email,
-                    age: parseInt(age),
-                    gender: gender,
-                    role: selectedRole,
-                    loggedIn: true
-                };
-                
-                localStorage.setItem('user', JSON.stringify(userData));
-                
-                // Redirect based on role
-                if (selectedRole === 'admin') {
-                    window.location.href = '/static/admin/index.html';
-                } else {
-                    window.location.href = '/static/user/index.html';
+                // Validate email format
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!emailRegex.test(email)) {
+                    alert('Please enter a valid email address');
+                    return;
                 }
+                
+                // Validate password
+                if (password.length < 6) {
+                    alert('Password must be at least 6 characters long');
+                    return;
+                }
+                
+                // Validate age
+                if (age < 13 || age > 120) {
+                    alert('Age must be between 13 and 120');
+                    return;
+                }
+                
+                // Show loading
+                const submitButton = event.target.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+                submitButton.disabled = true;
+                
+                // Make API call to backend
+                fetch('/api/v1/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        first_name: firstName,
+                        last_name: lastName,
+                        email: email,
+                        age: parseInt(age),
+                        gender: gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase(),
+                        password: password,
+                        phone: phone || null
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Store user info in localStorage
+                        const userData = {
+                            ...data.user,
+                            role: data.role,
+                            loggedIn: true
+                        };
+                        localStorage.setItem('user', JSON.stringify(userData));
+                        
+                        // Show success message
+                        alert(data.message);
+                        
+                        // Redirect to user dashboard (only users can register)
+                        window.location.href = '/static/user/index.html';
+                    } else {
+                        alert(data.message || 'Registration failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Registration error:', error);
+                    alert('Registration failed. Please check your connection and try again.');
+                })
+                .finally(() => {
+                    // Reset button
+                    submitButton.innerHTML = originalText;
+                    submitButton.disabled = false;
+                });
             }
         </script>
     </body>

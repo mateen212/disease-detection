@@ -8,6 +8,27 @@ class UserCreate(BaseModel):
     age: int = Field(..., ge=0, le=120)
     gender: str = Field(..., pattern="^(Male|Female|male|female)$")
 
+# Authentication models
+class UserRegister(BaseModel):
+    email: str = Field(..., pattern=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    password: str = Field(..., min_length=6, max_length=100)
+    first_name: str = Field(..., min_length=1, max_length=50)
+    last_name: str = Field(..., min_length=1, max_length=50)
+    age: int = Field(..., ge=13, le=120)
+    gender: str = Field(..., pattern="^(Male|Female)$")
+    phone: Optional[str] = Field(None, pattern=r'^\+?[\d\s\-\(\)]+$')
+    
+class UserLogin(BaseModel):
+    email: str = Field(..., pattern=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    password: str = Field(..., min_length=1)
+    role: str = Field(..., pattern="^(user|admin)$")
+
+class AuthResponse(BaseModel):
+    success: bool
+    message: str
+    user: Optional[Dict[str, Any]] = None
+    role: str
+
 class UserResponse(BaseModel):
     id: int
     name: str
