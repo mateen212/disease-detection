@@ -1,7 +1,14 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
+from sqlalchemy import inspect as sa_inspect
 from passlib.context import CryptContext
+try:
+    import bcrypt as _bcrypt_lib
+    _bcrypt_available = True
+except Exception:
+    _bcrypt_lib = None
+    _bcrypt_available = False
 import re
 
 from backend.db.database import get_db
@@ -14,15 +21,78 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 security = HTTPBearer()
-pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2", "bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
-    """Hash a password using bcrypt"""
+    """Hash a password using the configured context (argon2 preferred)."""
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against its hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+    """Verify a password against its hash.
+
+    Handles bcrypt's 72-byte limit by retrying verification with a
+    UTF-8 byte-truncated password when a ValueError indicates the
+    password is too long or when the stored hash looks like bcrypt.
+    Returns True on successful verification, False otherwise.
+    """
+    # If the stored hash looks like a bcrypt hash, try to verify it
+    # directly with the installed `bcrypt` package to avoid passlib's
+    # backend-detection path that can raise during import/version checks.
+    try:
+        if isinstance(hashed_password, str) and hashed_password.startswith("$2"):
+            if _bcrypt_available:
+                try:
+                    pw_bytes = plain_password.encode("utf-8")
+                    # bcrypt has a 72-byte input limit; truncate safely.
+                    result = _bcrypt_lib.checkpw(pw_bytes[:72], hashed_password.encode("utf-8"))
+                    return bool(result)
+                except Exception as e_bcrypt:
+                    logger.warning(f"bcrypt.checkpw failed: {e_bcrypt}")
+            # If bcrypt lib not available or direct check failed, fall
+            # back to a truncated pwd_context.verify attempt.
+            try:
+                b = plain_password.encode("utf-8")[:72]
+                truncated = b.decode("utf-8", errors="ignore")
+                logger.info("Retrying bcrypt verify with truncated password (72 bytes) via pwd_context.")
+                return pwd_context.verify(truncated, hashed_password)
+            except Exception as e_trunc:
+                logger.warning(f"Truncated password verify failed: {e_trunc}")
+                return False
+
+        # Non-bcrypt hashes (argon2, etc.) — use passlib context verify
+        return pwd_context.verify(plain_password, hashed_password)
+    except ValueError as ve:
+        # Known bcrypt limitation (72 bytes) or malformed hash
+        logger.warning(f"Password verification failed (ValueError): {ve}")
+        return False
+    except Exception as e:
+        # Unexpected failure — log and fail verification
+        logger.error(f"Password verification error: {e}")
+        return False
+
+
+def table_has_column(db: Session, table_name: str, column_name: str) -> bool:
+    """Check whether the given table has the specified column in the DB.
+
+    Uses SQLAlchemy inspector against the session bind so we can detect
+    schema drift between models and the actual database and provide a
+    clearer error message instead of a generic ProgrammingError.
+    """
+    try:
+        engine = db.get_bind()
+    except Exception:
+        engine = getattr(db, "bind", None)
+
+    if engine is None:
+        return False
+
+    try:
+        inspector = sa_inspect(engine)
+        cols = [c["name"] for c in inspector.get_columns(table_name)]
+        return column_name in cols
+    except Exception as e:
+        logger.warning(f"Could not inspect table {table_name}: {e}")
+        return False
 
 def validate_email(email: str) -> bool:
     """Validate email format"""
@@ -39,6 +109,11 @@ def validate_password(password: str) -> bool:
 async def register_user(user_data: UserRegister, db: Session = Depends(get_db)):
     """Register a new user - patients only (admin already exists)"""
     try:
+        # Ensure DB schema contains the expected `email` column
+        if not table_has_column(db, "users", "email"):
+            logger.error("Database schema mismatch: 'users.email' column missing.")
+            raise HTTPException(status_code=500, detail="Database schema mismatch: 'users.email' column missing. Run migrations or recreate the database to include the new column.")
+
         # Validate email format
         if not validate_email(user_data.email):
             raise HTTPException(status_code=400, detail="Invalid email format")
@@ -114,7 +189,12 @@ async def login_user(login_data: UserLogin, db: Session = Depends(get_db)):
             raise HTTPException(status_code=400, detail="Invalid email format")
         
         email = login_data.email.lower()
-        
+
+        # Ensure DB schema contains the expected `email` column for users
+        if login_data.role != "admin" and not table_has_column(db, "users", "email"):
+            logger.error("Database schema mismatch: 'users.email' column missing.")
+            raise HTTPException(status_code=500, detail="Database schema mismatch: 'users.email' column missing. Run migrations or recreate the database to include the new column.")
+
         # (argon2 used) no bcrypt 72-byte limitation; continue
 
         if login_data.role == "admin":
@@ -125,7 +205,8 @@ async def login_user(login_data: UserLogin, db: Session = Depends(get_db)):
             ).first()
             
             if not admin or not verify_password(login_data.password, admin.hashed_password):
-                raise HTTPException(status_code=401, detail="Invalid admin credentials")
+                logger.warning(f"Invalid admin login attempt: {email}")
+                raise HTTPException(status_code=401, detail=f"Invalid admin credentials: {login_data.password, admin.hashed_password}, {login_data.password}")
             
             logger.info(f"Admin login successful: {email}")
             
@@ -174,6 +255,7 @@ async def login_user(login_data: UserLogin, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         logger.error(f"Login error: {str(e)}")
+        # Do not exit the process; return a 500 to the client
         raise HTTPException(status_code=500, detail="Login failed. Please try again.")
 
 @router.get("/validate-token")

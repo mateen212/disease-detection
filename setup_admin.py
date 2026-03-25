@@ -13,7 +13,7 @@ from backend.db.database import engine, SessionLocal
 from backend.models.database_models import Base, Admin, User
 
 # Password hashing
-pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2", "bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
     """Hash a password using argon2"""
