@@ -33,14 +33,14 @@ This system integrates:
 ✅ **User Dashboard**: Intuitive interface for symptom input and results  
 ✅ **Admin Dashboard**: Dataset management and model training  
 ✅ **RESTful API**: FastAPI with comprehensive documentation  
-✅ **Data Management**: MySQL database with full history tracking  
+✅ **Data Management**: PostgreSQL database with full history tracking  
 
 ## 🔹 Installation & Setup
 
 ### Prerequisites
 
 - Python 3.8+
-- MySQL 5.7+ or 8.0+
+- PostgreSQL 12+ (or a hosted PostgreSQL like Supabase)
 - Node.js (optional, for development)
 
 ### 1. Clone Repository
@@ -70,27 +70,27 @@ pip install -r requirements.txt
 
 ### 4. Setup Database
 
-#### Install MySQL
+#### Install PostgreSQL (local)
 
 **Windows/macOS:**
-Download and install MySQL from [mysql.com](https://dev.mysql.com/downloads/)
+Download and install PostgreSQL from https://www.postgresql.org/download/
 
 **Ubuntu/Debian:**
 ```bash
 sudo apt update
-sudo apt install mysql-server
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
 ```
 
-#### Create Database
+#### Create Database (Postgres)
 
-```sql
-mysql -u root -p
-
-CREATE DATABASE disease_diagnosis;
-CREATE USER 'diagnosis_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON disease_diagnosis.* TO 'diagnosis_user'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
+```bash
+# Switch to postgres user and create DB + user
+sudo -u postgres psql
+CREATE DATABASE kbsproject;
+CREATE USER diagnosis_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE kbsproject TO diagnosis_user;
+\q
 ```
 
 ### 5. Configure Environment
@@ -103,18 +103,19 @@ cp .env.example .env
 nano .env
 ```
 
-Update the `.env` file:
+Update the `.env` file (example):
 ```env
-DATABASE_URL=mysql+mysqlconnector://diagnosis_user:your_password@localhost:3306/disease_diagnosis
+DATABASE_URL=postgresql+psycopg2://diagnosis_user:your_password@localhost:5432/kbsproject
 HOST=0.0.0.0
 PORT=8000
 ```
 
 ### 6. Initialize Database Tables
 
+Run the project-level database initializer which also seeds sample users:
+
 ```bash
-cd backend
-python -c "from db.database import create_tables; create_tables()"
+python3 init_db.py
 ```
 
 ## 🔹 Running the Application

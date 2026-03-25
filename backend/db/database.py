@@ -25,12 +25,14 @@ def create_tables():
             cols = [c['name'] for c in inspector.get_columns('users')]
 
             # map of column -> SQL definition to add if missing
+            # Use PostgreSQL-compatible column definitions and use
+            # `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` where possible.
             expected_cols = {
-                'email': "VARCHAR(100) NULL",
-                'first_name': "VARCHAR(50) NULL",
-                'last_name': "VARCHAR(50) NULL",
-                'phone': "VARCHAR(20) NULL",
-                'is_active': "TINYINT DEFAULT 1",
+                'email': "VARCHAR(100)",
+                'first_name': "VARCHAR(50)",
+                'last_name': "VARCHAR(50)",
+                'phone': "VARCHAR(20)",
+                'is_active': "BOOLEAN DEFAULT TRUE",
                 'role': "VARCHAR(20) DEFAULT 'user'"
             }
 
@@ -38,12 +40,13 @@ def create_tables():
                 for col, definition in expected_cols.items():
                     if col not in cols:
                         try:
-                            conn.execute(text(f"ALTER TABLE users ADD COLUMN {col} {definition}"))
+                            # Use IF NOT EXISTS for Postgres (no-op if already present)
+                            conn.execute(text(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {col} {definition}"))
                         except Exception:
                             # best-effort; continue adding other columns
                             pass
 
-                # create index for email if not present
+                # create index for email if not present (Postgres supports IF NOT EXISTS)
                 try:
                     conn.execute(text("CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)"))
                 except Exception:

@@ -81,7 +81,18 @@ def init_database():
                     logger.info(f"ℹ️ User '{user_username}' already exists (id={existing_user.id})")
             else:
                 hashed_user_pw = argon2.hash(user_password)
-                new_user = User(name=user_username, age=30, gender='other', hashed_password=hashed_user_pw)
+                # Provide required non-null fields defined by the User model
+                new_user = User(
+                    email=f"{user_username}@example.com",
+                    first_name="Sample",
+                    last_name="User",
+                    name=user_username,
+                    age=30,
+                    gender='other',
+                    hashed_password=hashed_user_pw,
+                    is_active=1,
+                    role='user'
+                )
                 db.add(new_user)
                 db.commit()
                 logger.info(f"✅ Sample user '{user_username}' created (id={new_user.id})")

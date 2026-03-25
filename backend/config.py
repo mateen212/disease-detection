@@ -11,8 +11,9 @@ class Config:
     It's like having all the hospital's operational guidelines in one place!
     """
     
-    # Where to find our patient database - like the address of our digital filing cabinet! 🗄
-    DATABASE_URL = os.getenv("DATABASE_URL", "mysql+mysqlconnector://root:password@localhost:3306/disease_diagnosis")
+    # Where to find our patient database - default to a local PostgreSQL URL
+    # Prefer setting `DATABASE_URL` in your environment (e.g. .env) to override.
+    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg2://postgres:password@localhost:5432/kbsproject")
     
     # Server settings - where our digital clinic will operate! 🏥🌍
     HOST = os.getenv("HOST", "0.0.0.0")      # What address to listen on (0.0.0.0 means "welcome everyone!")
